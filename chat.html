@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Consultation Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(135deg, rgb(11, 78, 78) 0%, rgb(20, 110, 110) 100%);
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: #e0f2f2;
+        }
+
+        .logo-img img {
+            height: 70px;
+            width: auto;
+        }
+
+        ul {
+            display: flex;
+            list-style: none;
+        }
+
+        ul li {
+            margin: 0 20px;
+        }
+
+        ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        ul li a:hover {
+            color: #e0f2f2;
+            transform: translateY(-2px);
+        }
+
+        #bar {
+            font-size: 25px;
+            display: none;
+            cursor: pointer;
+        }
+
+        .chat-container {
+            margin-top: 100px;
+            padding: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .doctors-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctor-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-item:hover {
+            background: #f0f8f8;
+        }
+
+        .doctor-item.active {
+            background: rgb(11, 78, 78);
+            color: white;
+        }
+
+        .doctor-item.active .doctor-info p {
+            color: #e0f2f2;
+        }
+
+        .doctor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .doctor-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .doctor-info p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .chat-box {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 160px);
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: rgb(11, 78, 78);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            background: #f0f8f8;
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            margin: 0 10px;
+        }
+
+        .message.user .message-content {
+            background: rgb(11, 78, 78);
+            color: white;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .chat-input button {
+            background: rgb(11, 78, 78);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: rgb(20, 110, 110);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            ul {
+                display: none;
+            }
+
+            #bar {
+                display: block;
+            }
+
+            .chat-container {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .doctors-list {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <div class="logo-img"><img src="12Health.png" alt="Health First Logo"></div>
+        </div>
+        <i id="bar" class="fa-solid fa-bars"></i>
+        <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="information.html"><i class="fas fa-info-circle"></i> Information</a></li>
+            <li><a href="consultancy.html"><i class="fas fa-comments"></i> Consultancy</a></li>
+            <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact Us</a></li>
+            <li><a href="about.html"><i class="fas fa-users"></i> About Us</a></li>
+            <li><a href="log.html"><i class="fas fa-sign-in-alt"></i>Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="chat-container">
+        <div class="doctors-list">
+            <h2 style="margin-bottom: 20px; color: rgb(11, 78, 78);">Available Doctors</h2>
+            <div class="doctor-item active" data-doctor="sarah">
+                <img src="c1.png" alt="Dr. Sarah Johnson" class="doctor-avatar">
+                <div class="doctor-info">
+                    <h3>Dr. Sarah Johnson</h3>
+                    <p>Clinical Psychologist</p>
+                </div>
+            </div>
+            <div class="doctor-item" data-doctor="michael">
+                <img src="c2.jpeg" alt="Dr. Michael Chen" class="doctor-avatar">
+                <div class="doctor-info">
+                    <h3>Dr. Michael Chen</h3>
+                    <p>Psychiatrist</p>
+                </div>
+            </div>
+            <div class="doctor-item" data-doctor="emily">
+                <img src="c3.jpeg" alt="Dr. Emily Martinez" class="doctor-avatar">
+                <div class="doctor-info">
+                    <h3>Dr. Emily Martinez</h3>
+                    <p>Family Therapist</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-box">
+            <div class="chat-header">
+                <img src="c1.png" alt="Dr. Sarah Johnson" class="doctor-avatar">
+                <div style="margin-left: 15px;">
+                    <h2>Dr. Sarah Johnson</h2>
+                    <p>Clinical Psychologist</p>
+                </div>
+            </div>
+            <div class="chat-messages">
+                <!-- Chat messages will be dynamically loaded here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message...">
+                <button>
+                    <i class="fas fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store chat histories for each doctor
+        const chatHistories = {
+            sarah: [
+                {
+                    type: 'doctor',
+                    avatar: 'c1.png',
+                    name: 'Dr. Sarah Johnson',
+                    message: 'Hello! I\'m Dr. Sarah Johnson, a Clinical Psychologist. How can I help you today?'
+                }
+            ],
+            michael: [
+                {
+                    type: 'doctor',
+                    avatar: 'c2.jpeg',
+                    name: 'Dr. Michael Chen',
+                    message: 'Hello! I\'m Dr. Michael Chen, a Psychiatrist specializing in mood disorders and PTSD treatment. How can I assist you today?'
+                }
+            ],
+            emily: [
+                {
+                    type: 'doctor',
+                    avatar: 'c3.jpeg',
+                    name: 'Dr. Emily Martinez',
+                    message: 'Hi! I\'m Dr. Emily Martinez, a Family Therapist. I\'m here to help you with any family-related concerns you may have.'
+                }
+            ]
+        };
+
+        let currentDoctor = 'sarah';
+
+        // Function to update chat header
+        function updateChatHeader(doctorData) {
+            const header = document.querySelector('.chat-header');
+            header.innerHTML = `
+                <img src="${doctorData.avatar}" alt="${doctorData.name}" class="doctor-avatar">
+                <div style="margin-left: 15px;">
+                    <h2>${doctorData.name}</h2>
+                    <p>${doctorData.specialty}</p>
+                </div>
+            `;
+        }
+
+        // Function to render chat messages
+        function renderChatMessages() {
+            const messagesContainer = document.querySelector('.chat-messages');
+            messagesContainer.innerHTML = '';
+            
+            chatHistories[currentDoctor].forEach(msg => {
+                const messageHTML = `
+                    <div class="message ${msg.type === 'user' ? 'user' : ''}">
+                        <img src="${msg.avatar}" alt="${msg.name}" class="doctor-avatar">
+                        <div class="message-content">
+                            ${msg.message}
+                        </div>
+                    </div>
+                `;
+                messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            });
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Add click event listeners to doctor items
+        document.querySelectorAll('.doctor-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.doctor-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                // Update current doctor and chat
+                currentDoctor = item.dataset.doctor;
+                const doctorInfo = {
+                    sarah: { name: 'Dr. Sarah Johnson', specialty: 'Clinical Psychologist', avatar: 'c1.png' },
+                    michael: { name: 'Dr. Michael Chen', specialty: 'Psychiatrist', avatar: 'c2.jpeg' },
+                    emily: { name: 'Dr. Emily Martinez', specialty: 'Family Therapist', avatar: 'c3.jpeg' }
+                }[currentDoctor];
+
+                updateChatHeader(doctorInfo);
+                renderChatMessages();
+            });
+        });
+
+        // Handle message sending
+        const input = document.querySelector('.chat-input input');
+        const sendButton = document.querySelector('.chat-input button');
+
+        function sendMessage() {
+            const message = input.value.trim();
+            if (message) {
+                // Add user message to chat history
+                chatHistories[currentDoctor].push({
+                    type: 'user',
+                    avatar: 'profile.jpg',
+                    name: 'User',
+                    message: message
+                });
+
+                // Render updated chat
+                renderChatMessages();
+                input.value = '';
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initial render
+        renderChatMessages();
+    </script>
+</body>
+</html>
